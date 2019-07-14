@@ -1,0 +1,45 @@
+body{
+    background-color:black
+
+}
+.SubtitleTextBody p {
+    color:#ddd;
+    margin-top:3px;
+    font-size:14px;
+}
+
+.SubtitleTextBody p:first-of-type {
+    color:#FFF;
+    margin-top:3px;
+    font-size:20px;
+    transition-duration: 500ms;
+}
+
+p{
+    margin-bottom: 0.5rem;
+    margin-top: 0.5rem;
+    transition-duration: 0ms;
+    opacity: 1;
+}
+
+.new{
+    opacity: 0;!important;
+}
+
+.noselect {
+
+    -webkit-touch-callout: none; /* iOS Safari */
+
+    -webkit-user-select: none; /* Chrome/Safari/Opera */
+
+    -khtml-user-select: none; /* Konqueror */
+
+    -moz-user-select: none; /* Firefox */
+
+    -ms-user-select: none; /* Internet Explorer/Edge */
+
+    user-select: none; /* Non-prefixed version, currently
+
+not supported by any browser */
+
+}
