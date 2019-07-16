@@ -1,24 +1,22 @@
 var config={
-    "BLDFAutoStart": true,
     "BLDFIntervalDelay": 2000,
-    "BLDFNeedSubBody": true,
     "BLDFRegex": "(?<=[“【]).*(?=[】”])",
-    "BLDFShowDanmaku": false,
-    "BLDFShowMatchedDanmakuText": true,
-    "BLDFShowOtherDanmaku": false,
+    "BLDFIgnore": "[【】]",
     "BLTFUrlPrefix": "https://api.vtb.wiki/webapi/message/",
     "BLTFUrlId":"759280052",
     "BLTFUrlSuffix": "/history?filter=%E3%80%90&text=true&client=Fly_snow",
-    "UpdateTime": "NAN",
-    "BLTFDoMatch": true
 }
 
 
 $(function () {
-    var BLDFReg = new RegExp(config.BLDFRegex);
+    var lock=false;
     setInterval(function () {
+        var BLDFReg = new RegExp(config.BLDFRegex);
+        var BLDFIgnore = new RegExp(config.BLDFIgnore);
+        lock=true;
         $.ajax({
             method: "GET",
+            cache:false,
             url: config.BLTFUrlPrefix+config.BLTFUrlId+config.BLTFUrlSuffix+"&t="+(Date.parse(new Date())),
             success: function(data) {
                 var tsget=[];
@@ -29,11 +27,21 @@ $(function () {
                         ss=tsget[i];
                         tsget[i]=tsget[i].replace(/<.*>/g,"");
                     }
-                    if((config.BLTFDoMatch))tsget[i]=tsget[i].match(BLDFReg);
+                    var matchls=tsget[i].match(BLDFReg);
+                    if(matchls!=null)
+                    for(var j=0;j<matchls.length;j++){
+                        tsget[i]=tsget[i].replace(matchls[j],"<span class=\"translation\">"+matchls[j]+"</span>")
+                    }
+                    ss="";
+                    while(ss!=tsget[i]){
+                        ss=tsget[i];
+                        tsget[i]=tsget[i].replace(BLDFIgnore,"");
+                    }
+
                 }
                 var tsexist=[]
                 $(".SubtitleTextBody p").each(function(i,obj){
-                    if($(obj).attr("style")==null || $(obj).attr("style")=="")tsexist.push($(obj).text());
+                    if($(obj).attr("style")==null || $(obj).attr("style")=="")tsexist.push($(obj).html());
                 });
                 var pget=tsget.length-1;
                 var pexist=0;
@@ -44,8 +52,11 @@ $(function () {
                         $('.new').removeClass('new');
                     },1);
                 }
-                console.log(tsget);console.log(tsexist);
 
+
+            },
+            complete:function () {
+                lock=false;
             }
         })
     },config.BLDFIntervalDelay);

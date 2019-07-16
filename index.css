@@ -3,15 +3,15 @@ body{
 
 }
 .SubtitleTextBody p {
-    color:#ddd;
+    color:#ddd9;
     margin-top:3px;
-    font-size:14px;
+    font-size:1rem;
 }
 
 .SubtitleTextBody p:first-of-type {
-    color:#FFF;
+    color:#FFF9;
     margin-top:3px;
-    font-size:20px;
+    font-size:1.5rem;
     transition-duration: 500ms;
 }
 
@@ -42,4 +42,8 @@ p{
 
 not supported by any browser */
 
+}
+
+.translation{
+    color:#FFF;
 }
