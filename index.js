@@ -11,8 +11,8 @@ var config={
 $(function () {
     var lock=false;
     setInterval(function () {
-        var BLDFReg = new RegExp(config.BLDFRegex);
-        var BLDFIgnore = new RegExp(config.BLDFIgnore);
+        var BLDFReg = new RegExp(config.BLDFRegex,"g");
+        var BLDFIgnore = new RegExp(config.BLDFIgnore,"g");
         lock=true;
         $.ajax({
             method: "GET",
@@ -22,22 +22,16 @@ $(function () {
                 var tsget=[];
                 tsget=data.trim().split("\n");
                 for(var i=0;i<tsget.length;i++){
-                    var ss="";
-                    while(ss!=tsget[i]){
-                        ss=tsget[i];
-                        tsget[i]=tsget[i].replace("<","&lt;");
-                        tsget[i]=tsget[i].replace(">","&rt;");
-                    }
+                        tsget[i]=tsget[i].replace(/[<]/g,"&lt;");
+                        tsget[i]=tsget[i].replace(/[>]/g,"&rt;");
                     var matchls=tsget[i].match(BLDFReg);
                     if(matchls!=null)
                     for(var j=0;j<matchls.length;j++){
                         tsget[i]=tsget[i].replace(matchls[j],"<span class=\"translation\">"+matchls[j]+"</span>")
                     }
-                    ss="";
-                    while(ss!=tsget[i]){
-                        ss=tsget[i];
+
                         tsget[i]=tsget[i].replace(BLDFIgnore,"");
-                    }
+
 
                 }
                 var tsexist=[]
