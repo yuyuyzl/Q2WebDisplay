@@ -3,7 +3,7 @@ var config = {
     "BLDFRegex": "【(.+?)】",
 
     "CJId": "ddcenter",
-    "CJUrlPrefix": "http://127.0.0.1:10101/"
+    "CJUrlPrefix": "https://api.vtb.wiki/q2w"
 }
 
 var lastTime = '0';
