@@ -25,7 +25,8 @@ $(function () {
                     var ss="";
                     while(ss!=tsget[i]){
                         ss=tsget[i];
-                        tsget[i]=tsget[i].replace(/<.*>/g,"");
+                        tsget[i]=tsget[i].replace("<","&lt;");
+                        tsget[i]=tsget[i].replace(">","&rt;");
                     }
                     var matchls=tsget[i].match(BLDFReg);
                     if(matchls!=null)
