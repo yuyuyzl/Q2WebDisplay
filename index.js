@@ -2,7 +2,7 @@ var config = {
     "BLDFIntervalDelay": 3000,
     "BLDFRegex": "【(.+?)】",
 
-    "CJId": "ddcenter",
+    "CJId": "test",
     "CJUrlPrefix": "https://api.vtb.wiki/q2w"
 }
 
