@@ -4,7 +4,7 @@ var config = {
 
     "CJId": "test",
     "CJUrlPrefix": "https://api.vtb.wiki/q2w"
-}
+};
 
 var lastTime = '0';
 
@@ -17,7 +17,8 @@ $(function () {
         $.ajax({
             method: "GET",
             cache: true,
-            url: config.CJUrlPrefix + "?args=" + config.CJId + '|' + lastTime,
+            url: config.CJUrlPrefix + "?"+"t="+(new Date().getTime())+"&"+"args=" + config.CJId + '|' + lastTime,
+
             success: function (data) {
                 var tsget = data.trim().split("\n");
                 lastTime = tsget[0];
