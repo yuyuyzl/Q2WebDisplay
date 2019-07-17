@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Bilibili Live Translate Fetcher
 // @namespace    http://tampermonkey.net/
-// @version      0.0.3
+// @version      0.0.1
 // @description  测试用的小玩具
 // @author       yuyuyzl
 // @require      https://code.jquery.com/jquery-3.4.0.min.js
@@ -13,23 +13,20 @@
 // @grant        GM_setClipboard
 // @grant        GM_info
 // @match        *://live.bilibili.com/*
+// @match        *://www.youtube.com/*
 // ==/UserScript==
 
 var BLDFReg;
 var intervalID=-1;
 var updateTime="";
-var config={
-    "BLDFAutoStart": true,
-    "BLDFIntervalDelay": 2000,
-    "BLDFNeedSubBody": true,
-    "BLDFRegex": "(?<=[“【]).*(?=[】”])",
-    "BLDFShowDanmaku": false,
-    "BLDFShowMatchedDanmakuText": true,
-    "BLDFShowOtherDanmaku": false,
-    "BLTFUrlPrefix":"https://api.vtb.wiki/webapi/message/663606562/history?filter=%E3%80%90&text=true",
-    "BLTFUrlSuffix":""
-};
+var config = {
+    "BLDFIntervalDelay": 3000,
+    "BLDFRegex": "【(.+?)】",
 
+    "CJId": "ddcenter",
+    "CJUrlPrefix": "https://api.vtb.wiki/q2w"
+};
+var lastTime = '0';
 (function() {
     'use strict';
     var reloadConfig=function(){
@@ -45,7 +42,7 @@ var config={
         });
     };
     reloadConfig();
-    if(window.location.href.match(/.*live.bilibili.com.*/)) {
+    if(window.location.href.match(/.*live.bilibili.com.*/) || window.location.href.match(/.*www.youtube.com.*/)) {
         if((GM_getValue("UpdateTime"))==null)GM_setValue("UpdateTime","NAN");
         updateTime=GM_getValue("UpdateTime");
         setTimeout(function () {
@@ -72,80 +69,57 @@ var config={
                 '    </style>');
             $(".icon-left-part").append('<span data-v-b74ea690="" id="regexOn" title="开关过滤" class="icon-item icon-font icon-block" style="color: royalblue"></span>');
             $(".icon-left-part").append('<span data-v-b74ea690="" id="regexSettings" title="正则过滤设置" class="icon-item icon-font icon-config" style="color: royalblue"></span>');
-            if (config.BLDFNeedSubBody) {
+            if (config.BLDFNeedSubBody && window.location.href.match(/.*live.bilibili.com.*/)) {
                 $("#gift-control-vm").before('<div class="SubtitleBody"><div style="height:100%;position:relative;"><div class="SubtitleTextBodyFrame"><div class="SubtitleTextBody"></div></div></div></div>');
                 $(".bilibili-live-player").append('<div class="SubtitleBody Fullscreen ui-resizable"><div style="height:100%;position:relative;"><div class="SubtitleTextBodyFrame"><div class="SubtitleTextBody"></div></div></div><div class="ui-resizable-handle ui-resizable-e" style="z-index: 90;"></div><div class="ui-resizable-handle ui-resizable-s" style="z-index: 90;"></div><div class="ui-resizable-handle ui-resizable-se ui-icon ui-icon-gripsmall-diagonal-se" style="z-index: 90;"></div></div>');
                 $(".SubtitleBody.Fullscreen").draggable();
             }
-            var startInterval = function () {
 
-                if (intervalID >= 0) clearInterval(intervalID);
-
-                BLDFReg = new RegExp(config.BLDFRegex);
-                intervalID = setInterval(function () {
-                    /*
-                    if(updateTime!=GM_getValue("UpdateTime")){
-                        updateTime=GM_getValue("UpdateTime");
-                        reloadConfig();
-                        $('.SubtitleTextBody').prepend("<p style='color: gray'>" + "已更新配置" + "</p>");
-                        startInterval();
-                    }
-                    $(".bilibili-danmaku").each(function (i, obj) {
-                        if (!(obj.innerText[obj.innerText.length - 1] == " ")) {
-                            if (!config.BLDFShowDanmaku) $(obj).addClass("invisibleDanmaku");
-                            var matchres = obj.innerText.match(BLDFReg);
-                            console.log(obj.innerText);
-                            if (matchres != null && matchres != "") {
-                                if (config.BLDFShowDanmaku) $(obj).removeClass("invisibleDanmaku");
-                                //console.log(matchres);
-                                $('.SubtitleTextBody').prepend("<p>" + matchres + "</p>");
-                                $('.SubtitleTextBody').each(function (i, obj) {
-                                    $(obj).children().each(function (i, obj) {
-                                        if (i >= 6) {
-                                            //obj.remove();
-                                        }
-                                    });
-                                });
-                                if (config.BLDFShowMatchedDanmakuText) obj.innerText = matchres + ' '; else obj.innerText = obj.innerText + ' ';
-                            } else {
-                                obj.innerText = obj.innerText + ' ';
-                                if (!config.BLDFShowOtherDanmaku) $(obj).addClass("invisibleDanmaku");
-                            }
-                        }
-                    })*/
-
-                    GM_xmlhttpRequest({
-                        method: "GET",
-                        url: config.BLTFUrlPrefix+config.BLTFUrlSuffix+"&t="+(Date.parse(new Date())),
-                        onload: function(response) {
-                            var tsget=[];
-                            tsget=response.responseText.trim().split("\n");
-                            for(var i=0;i<tsget.length;i++){
-                                var ss="";
-                                while(ss!=tsget[i]){
-                                    ss=tsget[i];
-                                    tsget[i]=tsget[i].replace(/<.*>/g,"");
-                                }
-
-                            }
-                            var tsexist=[]
-                            $(".SubtitleTextBody p").each(function(i,obj){
-                                if($(obj).attr("style")==null || $(obj).attr("style")=="")tsexist.push($(obj).text());
-                            });
-                            var pget=tsget.length-1;
-                            var pexist=0;
-                            while(pget>=0&&tsget[pget]!=tsexist[pexist])pget--;
-                            for(var i=pget+1;i<tsget.length;i++){
-                                $('.SubtitleTextBody').prepend("<p>" + tsget[i] + "</p>");
-                            }
-                            console.log(tsget);console.log(tsexist);
-
-                        }
-                    });
-                }, config.BLDFIntervalDelay);
-
+            if (config.BLDFNeedSubBody && window.location.href.match(/.*www.youtube.com.*/)) {
+                $("#player-container-outer").after('<div class="SubtitleBody"><div style="height:100%;position:relative;"><div class="SubtitleTextBodyFrame"><div class="SubtitleTextBody"></div></div></div></div>');
+                //$(".bilibili-live-player").append('<div class="SubtitleBody Fullscreen ui-resizable"><div style="height:100%;position:relative;"><div class="SubtitleTextBodyFrame"><div class="SubtitleTextBody"></div></div></div><div class="ui-resizable-handle ui-resizable-e" style="z-index: 90;"></div><div class="ui-resizable-handle ui-resizable-s" style="z-index: 90;"></div><div class="ui-resizable-handle ui-resizable-se ui-icon ui-icon-gripsmall-diagonal-se" style="z-index: 90;"></div></div>');
+                //$(".SubtitleBody.Fullscreen").draggable();
             }
-            if (config.BLDFAutoStart) startInterval();
+
+            var lock = false;
+            var BLDFReg = new RegExp(config.BLDFRegex, 'g');
+            function update() {
+                if (lock) return;
+                lock = true;
+                GM_xmlhttpRequest({
+                    method: "GET",
+                    cache: true,
+                    url: config.CJUrlPrefix + "?args=" + config.CJId + '|' + lastTime,
+                    onload: function (data) {
+                        data=data.responseText;
+                        var tsget = data.trim().split("\n");
+                        lastTime = tsget[0];
+                        tsget.shift();
+                        tsget.slice().reverse().forEach(function (line, index) {
+                            var lineProc = line.replace(/<.*>/g, "");
+                            lineProc = filterXSS(lineProc);
+                            var matches = lineProc.match(BLDFReg);
+                            if (matches != null)
+                                matches.forEach(function (match) {
+                                    lineProc = lineProc.replace(match, "<span class=\"translation\">" + match.replace("【", "").replace("】", "") + "</span>");
+                                });
+
+                            $('.SubtitleTextBody').prepend("<p class='new'>" + lineProc + "</p>");
+                            setTimeout(function () {
+                                $('.new').removeClass('new');
+                            }, 1);
+                        });
+                        lock = false;
+                    }
+                });
+            }
+
+
+            update();
+            setInterval(function () {
+                update();
+            }, config.BLDFIntervalDelay);
+            /*
             $("#regexSettings").click(function () {
                 window.open("https://yuyuyzl.github.io/BiliDMFilter/");
             });
@@ -163,7 +137,7 @@ var config={
                     $('.SubtitleTextBody').prepend("<p style='color: gray'>" + "弹幕过滤开始" + "</p>");
                     startInterval();
                 }
-            });
+            });*/
         }, 3000);
 
     }else
