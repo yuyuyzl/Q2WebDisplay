@@ -23,7 +23,7 @@ var config = {
     "BLDFIntervalDelay": 3000,
     "BLDFRegex": "【(.+?)】",
 
-    "CJId": "ddcenter",
+    "CJId": "test",
     "CJUrlPrefix": "https://api.vtb.wiki/q2w"
 };
 var lastTime = '0';
@@ -69,13 +69,13 @@ var lastTime = '0';
                 '    </style>');
             $(".icon-left-part").append('<span data-v-b74ea690="" id="regexOn" title="开关过滤" class="icon-item icon-font icon-block" style="color: royalblue"></span>');
             $(".icon-left-part").append('<span data-v-b74ea690="" id="regexSettings" title="正则过滤设置" class="icon-item icon-font icon-config" style="color: royalblue"></span>');
-            if (config.BLDFNeedSubBody && window.location.href.match(/.*live.bilibili.com.*/)) {
+            if (window.location.href.match(/.*live.bilibili.com.*/)) {
                 $("#gift-control-vm").before('<div class="SubtitleBody"><div style="height:100%;position:relative;"><div class="SubtitleTextBodyFrame"><div class="SubtitleTextBody"></div></div></div></div>');
                 $(".bilibili-live-player").append('<div class="SubtitleBody Fullscreen ui-resizable"><div style="height:100%;position:relative;"><div class="SubtitleTextBodyFrame"><div class="SubtitleTextBody"></div></div></div><div class="ui-resizable-handle ui-resizable-e" style="z-index: 90;"></div><div class="ui-resizable-handle ui-resizable-s" style="z-index: 90;"></div><div class="ui-resizable-handle ui-resizable-se ui-icon ui-icon-gripsmall-diagonal-se" style="z-index: 90;"></div></div>');
                 $(".SubtitleBody.Fullscreen").draggable();
             }
 
-            if (config.BLDFNeedSubBody && window.location.href.match(/.*www.youtube.com.*/)) {
+            if (window.location.href.match(/.*www.youtube.com.*/)) {
                 $("#player-container-outer").after('<div class="SubtitleBody"><div style="height:100%;position:relative;"><div class="SubtitleTextBodyFrame"><div class="SubtitleTextBody"></div></div></div></div>');
                 //$(".bilibili-live-player").append('<div class="SubtitleBody Fullscreen ui-resizable"><div style="height:100%;position:relative;"><div class="SubtitleTextBodyFrame"><div class="SubtitleTextBody"></div></div></div><div class="ui-resizable-handle ui-resizable-e" style="z-index: 90;"></div><div class="ui-resizable-handle ui-resizable-s" style="z-index: 90;"></div><div class="ui-resizable-handle ui-resizable-se ui-icon ui-icon-gripsmall-diagonal-se" style="z-index: 90;"></div></div>');
                 //$(".SubtitleBody.Fullscreen").draggable();
@@ -89,15 +89,16 @@ var lastTime = '0';
                 GM_xmlhttpRequest({
                     method: "GET",
                     cache: true,
-                    url: config.CJUrlPrefix + "?args=" + config.CJId + '|' + lastTime,
+                    url:  config.CJUrlPrefix + "?"+"t="+(new Date().getTime())+"&"+"args=" + config.CJId + '|' + lastTime,
                     onload: function (data) {
                         data=data.responseText;
+                        console.log(data);
                         var tsget = data.trim().split("\n");
                         lastTime = tsget[0];
                         tsget.shift();
                         tsget.slice().reverse().forEach(function (line, index) {
                             var lineProc = line.replace(/<.*>/g, "");
-                            lineProc = filterXSS(lineProc);
+                            //lineProc = filterXSS(lineProc);
                             var matches = lineProc.match(BLDFReg);
                             if (matches != null)
                                 matches.forEach(function (match) {
