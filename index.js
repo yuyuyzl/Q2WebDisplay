@@ -2,8 +2,8 @@ var config = {
     "BLDFIntervalDelay": 3000,
     "BLDFRegex": "【(.+?)】",
 
-    "CJId": "test",
-    "CJUrlPrefix": "https://api.vtb.wiki/q2w"
+    "CJId": "matsuri",
+    "CJUrlPrefix": "https://matsuri.huolonglive.com"
 };
 
 var lastTime = '0';
